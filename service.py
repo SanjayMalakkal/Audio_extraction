@@ -1,6 +1,6 @@
 import google.generativeai as genai
 from config import GEMINI_API_KEY, MODEL_NAME
-
+import asyncio
 genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel(MODEL_NAME)
@@ -8,7 +8,7 @@ model = genai.GenerativeModel(MODEL_NAME)
 
 async def stream_extract(audio_bytes, prompt):
 
-    response = model.generate_content(
+    response = await model.generate_content_async(
         [
             prompt,
             {
@@ -16,10 +16,17 @@ async def stream_extract(audio_bytes, prompt):
                 "data": audio_bytes
             }
         ],
-        stream=True
+        stream=True,
+        generation_config={
+            "temperature":0,
+            "max_output_tokens":8192,
+            "top_p":0.9,
+            "top_k":40,
+            "response_mime_type":"application/json"
+        }
     )
 
-    for chunk in response:
+    async for chunk in response:
 
         # skip empty chunks
         if not chunk.candidates:
