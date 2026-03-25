@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  audio-extraction:
+    build: .
+    container_name: audio-extraction-app
+    ports:
+      - "9001:9001"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
